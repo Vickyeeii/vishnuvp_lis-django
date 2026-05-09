@@ -1,4 +1,5 @@
 from django.db import models
+from accounts.models import CustomUser
 
 
 class TestCategory(models.Model):
@@ -50,3 +51,60 @@ class LabTest(models.Model):
 
     def __str__(self):
         return f"{self.test_name} ({self.test_code})"
+
+class SampleCollection(models.Model):
+
+    CONDITION_CHOICES = (
+        ('good', 'Good'),
+        ('damaged', 'Damaged'),
+        ('hemolyzed', 'Hemolyzed'),
+    )
+
+    STATUS_CHOICES = (
+        ('collected', 'Collected'),
+        ('received', 'Received in Lab'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+    )
+
+    order = models.OneToOneField(
+    'orders.LabOrder',
+        on_delete=models.CASCADE,
+        related_name='sample'
+    )
+
+    sample_id = models.CharField(
+        max_length=100,
+        unique=True
+    )
+
+    collected_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        limit_choices_to={'role': 'phlebotomist'}
+    )
+
+    collection_date = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    sample_condition = models.CharField(
+        max_length=30,
+        choices=CONDITION_CHOICES,
+        default='good'
+    )
+
+    status = models.CharField(
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default='collected'
+    )
+
+    notes = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    def __str__(self):
+        return self.sample_id
