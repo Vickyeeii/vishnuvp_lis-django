@@ -1,0 +1,274 @@
+{% extends 'base.html' %} {% block content %}
+
+<h1 class="page-title">Lab Orders</h1>
+
+<!-- Create Lab Order Panel -->
+<div class="form-card mb-4">
+  <div class="form-card-title">Create New Lab Order (Multi-Test Desk)</div>
+  <form id="orderForm" method="POST">
+    {% csrf_token %}
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Patient <span style="color: var(--danger);">*</span></label>
+        <select name="patient" class="form-select" required>
+          <option value="" disabled selected>Select Patient</option>
+          {% for patient in patients %}
+            <option value="{{ patient.id }}">
+              {{ patient.first_name }} {{ patient.last_name }} (MRN: {{ patient.mrn }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Physician <span style="color: var(--danger);">*</span></label>
+        <select name="physician" class="form-select" required>
+          <option value="" disabled selected>Select Physician</option>
+          {% for physician in physicians %}
+            <option value="{{ physician.id }}">Dr. {{ physician.username }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Priority <span style="color: var(--danger);">*</span></label>
+        <select name="priority" class="form-select" required>
+          <option value="normal" selected>Normal</option>
+          <option value="urgent">Urgent</option>
+          <option value="stat">STAT</option>
+        </select>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Clinical Notes</label>
+        <textarea name="clinical_notes" class="form-control" rows="1" placeholder="Optional notes..." style="resize: none;"></textarea>
+      </div>
+    </div>
+
+    <!-- Assay Search & Selection Panel -->
+    <div class="clinical-card mb-4" style="padding: 20px; border: 1px solid var(--border-color); margin-top: 16px;">
+      <h6 style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent-blue); margin-bottom: 16px;">Assay Selector</h6>
+      <div class="row align-items-end">
+        <div class="col-md-8 mb-2">
+          <label class="form-label">Search and Select Assay</label>
+          <select id="assaySearchSelect" class="form-select">
+            <option value="" disabled selected>Select an assay to add...</option>
+            {% for test in tests %}
+              <option value="{{ test.id }}" data-code="{{ test.test_code }}" data-sample="{{ test.sample_type }}" data-price="{{ test.price }}">
+                {{ test.test_name }} ({{ test.test_code }}) — ${{ test.price }} [{{ test.sample_type|upper }}]
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4 mb-2">
+          <button type="button" id="addAssayBtn" class="btn-premium btn-premium-secondary w-100" style="padding: 10px;">
+            Add Assay to Order
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Selection Grid -->
+      <div class="table-responsive mt-3" style="border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background-color: var(--bg-color);">
+        <table class="table-premium" id="selectedAssaysTable" style="font-size: 0.8rem;">
+          <thead>
+            <tr>
+              <th style="padding: 10px 16px;">Code</th>
+              <th style="padding: 10px 16px;">Assay Name</th>
+              <th style="padding: 10px 16px;">Sample Type</th>
+              <th style="padding: 10px 16px;">Price</th>
+              <th style="text-align: center; padding: 10px 16px;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="selectedAssaysBody">
+            <tr id="emptyAssayPlaceholder">
+              <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 24px; font-size: 0.82rem;">No assays selected yet. Please use the selector above.</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr style="border-top: 1px solid var(--border-color); background-color: rgba(255,255,255,0.01);">
+              <td colspan="3" style="text-align: right; font-weight: 600; padding: 12px 16px; color: var(--text-secondary);">Total Price:</td>
+              <td colspan="2" style="font-weight: 700; padding: 12px 16px; color: var(--accent-blue); font-size: 0.9rem;" id="totalPriceDisplay">$0.00</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Hidden input container for tests -->
+    <div id="hiddenInputsContainer"></div>
+
+    <button type="submit" class="btn-premium btn-premium-primary" style="padding: 10px 24px; font-weight: 600;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      Submit Lab Order
+    </button>
+  </form>
+</div>
+
+<!-- Active Lab Orders List -->
+<div class="table-wrapper">
+  <div class="table-title-area">
+    <div class="table-title">All Active Lab Orders</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table-premium">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Patient</th>
+          <th>Physician</th>
+          <th>Assays Ordered</th>
+          <th>Priority</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td><strong style="color: var(--text-primary); font-weight: 600;">#{{ order.id }}</strong></td>
+          <td>{{ order.patient.first_name }} {{ order.patient.last_name }}</td>
+          <td>Dr. {{ order.physician.username }}</td>
+          <td>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              {% for test in order.tests.all %}
+                <span class="badge-premium" style="background-color: rgba(255,255,255,0.04); border-color: var(--border-color); color: var(--text-secondary);">{{ test.test_name }}</span>
+              {% empty %}
+                <span style="color: var(--text-secondary); font-size: 0.8rem;">No assays selected</span>
+              {% endfor %}
+            </div>
+          </td>
+          <td>
+            {% if order.priority == 'stat' %}
+              <span class="badge-premium badge-priority-stat">STAT</span>
+            {% elif order.priority == 'urgent' %}
+              <span class="badge-premium badge-priority-urgent">Urgent</span>
+            {% else %}
+              <span class="badge-premium badge-priority-normal">Normal</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if order.status == 4 %}
+              <span class="badge-premium badge-status-completed">Completed</span>
+            {% elif order.status == 2 %}
+              <span class="badge-premium badge-status-collected">Sample Collected</span>
+            {% elif order.status == 3 %}
+              <span class="badge-premium badge-status-processing">In-Lab</span>
+            {% else %}
+              <span class="badge-premium badge-status-pending">Ordered</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 32px; font-size: 0.82rem;">No active lab orders available.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const selectElement = document.getElementById("assaySearchSelect");
+  const addBtn = document.getElementById("addAssayBtn");
+  const tableBody = document.getElementById("selectedAssaysBody");
+  const placeholder = document.getElementById("emptyAssayPlaceholder");
+  const totalPriceDisplay = document.getElementById("totalPriceDisplay");
+  const hiddenInputsContainer = document.getElementById("hiddenInputsContainer");
+  const form = document.getElementById("orderForm");
+
+  let selectedAssays = [];
+
+  function updateTable() {
+    if (selectedAssays.length === 0) {
+      placeholder.style.display = "";
+      totalPriceDisplay.textContent = "$0.00";
+      hiddenInputsContainer.innerHTML = "";
+      return;
+    }
+
+    placeholder.style.display = "none";
+    tableBody.querySelectorAll(".assay-row").forEach(row => row.remove());
+    hiddenInputsContainer.innerHTML = "";
+
+    let total = 0;
+
+    selectedAssays.forEach(assay => {
+      total += parseFloat(assay.price);
+
+      // Create row
+      const tr = document.createElement("tr");
+      tr.className = "assay-row";
+      tr.innerHTML = `
+        <td style="padding: 10px 16px;"><span class="code-mrn">${assay.code}</span></td>
+        <td style="padding: 10px 16px;"><strong style="color: var(--text-primary); font-weight: 600;">${assay.name}</strong></td>
+        <td style="padding: 10px 16px;"><span class="badge-premium" style="background-color: rgba(255,255,255,0.03); color: var(--text-secondary); border-color: var(--border-color);">${assay.sample.toUpperCase()}</span></td>
+        <td style="padding: 10px 16px; color: var(--text-primary); font-weight: 500;">$${parseFloat(assay.price).toFixed(2)}</td>
+        <td style="text-align: center; padding: 10px 16px;">
+          <button type="button" class="btn-premium btn-premium-danger remove-assay-btn" data-id="${assay.id}" style="padding: 3px 10px; font-size: 0.75rem;">&times; Remove</button>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+
+      // Create hidden input
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "tests";
+      input.value = assay.id;
+      hiddenInputsContainer.appendChild(input);
+    });
+
+    totalPriceDisplay.textContent = `$${total.toFixed(2)}`;
+
+    // Add event listeners to remove buttons
+    document.querySelectorAll(".remove-assay-btn").forEach(btn => {
+      btn.addEventListener("click", function() {
+        const idToRemove = this.getAttribute("data-id");
+        selectedAssays = selectedAssays.filter(a => a.id !== idToRemove);
+        updateTable();
+      });
+    });
+  }
+
+  addBtn.addEventListener("click", function() {
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    if (!selectedOption || selectElement.value === "") {
+      alert("Please select a valid assay from the dropdown list first.");
+      return;
+    }
+
+    const id = selectElement.value;
+    const code = selectedOption.getAttribute("data-code");
+    const name = selectedOption.text.split(" (")[0];
+    const sample = selectedOption.getAttribute("data-sample");
+    const price = selectedOption.getAttribute("data-price");
+
+    // Check if duplicate assay
+    if (selectedAssays.some(a => a.id === id)) {
+      alert("This assay has already been added to the current order.");
+      return;
+    }
+
+    selectedAssays.push({ id, code, name, sample, price });
+    updateTable();
+
+    // Reset selector
+    selectElement.selectedIndex = 0;
+  });
+
+  form.addEventListener("submit", function(e) {
+    if (selectedAssays.length === 0) {
+      e.preventDefault();
+      alert("Please add at least one assay (test) to the order list before submitting.");
+    }
+  });
+});
+</script>
+
+{% endblock %}

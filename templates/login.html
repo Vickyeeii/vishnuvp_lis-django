@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LIS — Laboratory Information System Login</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS styles matching our design system -->
+    <style>
+      :root {
+        --bg-color: #0A0A0B;
+        --card-color: #16181D;
+        --border-color: rgba(255, 255, 255, 0.06);
+        --text-primary: #F5F5F7;
+        --text-secondary: #9CA3AF;
+        --accent-blue: #3B82F6;
+        --danger: #EF4444;
+        --font-sans: 'Inter', -apple-system, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-primary);
+        font-family: var(--font-sans);
+        letter-spacing: -0.011em;
+        -webkit-font-smoothing: antialiased;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      .login-container {
+        width: 100%;
+        max-width: 400px;
+        padding: 20px;
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+
+      .login-brand {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        background-color: var(--card-color);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--accent-blue);
+        margin-bottom: 16px;
+      }
+
+      .login-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        letter-spacing: -0.022em;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+      }
+
+      .login-subtitle {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+      }
+
+      .login-card {
+        background-color: var(--card-color);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 32px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+        letter-spacing: 0.02em;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 11px 14px;
+        font-family: var(--font-sans);
+        font-size: 0.84rem;
+        color: var(--text-primary);
+        background-color: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .form-control:focus {
+        border-color: rgba(255, 255, 255, 0.2);
+        outline: none;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+      }
+
+      .btn-submit {
+        width: 100%;
+        padding: 11px;
+        background-color: var(--text-primary);
+        color: var(--bg-color);
+        border: none;
+        border-radius: 8px;
+        font-family: var(--font-sans);
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+        margin-top: 8px;
+      }
+
+      .btn-submit:hover {
+        background-color: #E4E4E7;
+      }
+
+      /* Alert message boxes inside the card */
+      .alert-box {
+        background-color: rgba(239, 68, 68, 0.08);
+        border: 1px solid rgba(239, 68, 68, 0.15);
+        color: var(--danger);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 0.8rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-header">
+        <div class="login-brand">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+        </div>
+        <h1 class="login-title">LIS Workspace</h1>
+        <p class="login-subtitle">Sign in to laboratory information panel</p>
+      </div>
+
+      <div class="login-card">
+        <!-- Display django message errors if any -->
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert-box">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>{{ message.message }}</span>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input
+              type="text"
+              name="username"
+              class="form-control"
+              placeholder="Enter username"
+              required
+              autofocus
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input
+              type="password"
+              name="password"
+              class="form-control"
+              placeholder="Enter password"
+              required
+            />
+          </div>
+
+          <button class="btn-submit" type="submit">Sign In</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

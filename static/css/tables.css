@@ -1,0 +1,133 @@
+/* LIS Premium Minimalist Design System - Tables & Badges */
+
+.table-wrapper {
+  background-color: var(--card-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.table-title-area {
+  padding: 24px 24px 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-premium {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.table-premium th {
+  font-weight: 500;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: rgba(255, 255, 255, 0.01);
+}
+
+.table-premium td {
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  vertical-align: middle;
+}
+
+.table-premium tr:last-child td {
+  border-bottom: none;
+}
+
+.table-premium tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.table-premium tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.015);
+}
+
+/* Premium Minimalist Badges (Muted & Sleek) */
+.badge-premium {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  text-transform: capitalize;
+}
+
+/* Priority variations */
+.badge-priority-stat {
+  background-color: rgba(239, 68, 68, 0.08);
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.15);
+}
+
+.badge-priority-urgent {
+  background-color: rgba(245, 158, 11, 0.08);
+  color: var(--warning);
+  border-color: rgba(245, 158, 11, 0.15);
+}
+
+.badge-priority-normal {
+  background-color: rgba(59, 130, 246, 0.08);
+  color: var(--accent-blue);
+  border-color: rgba(59, 130, 246, 0.15);
+}
+
+/* Status variations */
+.badge-status-completed {
+  background-color: rgba(16, 185, 129, 0.08);
+  color: var(--success);
+  border-color: rgba(16, 185, 129, 0.15);
+}
+
+.badge-status-collected {
+  background-color: rgba(59, 130, 246, 0.08);
+  color: var(--accent-blue);
+  border-color: rgba(59, 130, 246, 0.15);
+}
+
+.badge-status-processing {
+  background-color: rgba(245, 158, 11, 0.08);
+  color: var(--warning);
+  border-color: rgba(245, 158, 11, 0.15);
+}
+
+.badge-status-pending {
+  background-color: rgba(255, 255, 255, 0.02);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+/* Monospace code styling */
+.code-mrn {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 0.78rem;
+  background-color: rgba(255, 255, 255, 0.04);
+  padding: 3px 6px;
+  border-radius: 4px;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}

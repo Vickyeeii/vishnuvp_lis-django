@@ -2,6 +2,12 @@ from django.contrib import admin
 from .models import LabOrder
 
 
+from .models import OrderLine
+
+class OrderLineInline(admin.TabularInline):
+    model = OrderLine
+    extra = 1
+
 @admin.register(LabOrder)
 class LabOrderAdmin(admin.ModelAdmin):
 
@@ -26,4 +32,4 @@ class LabOrderAdmin(admin.ModelAdmin):
         'physician__username'
     ]
 
-    filter_horizontal = ['tests']
+    inlines = [OrderLineInline]

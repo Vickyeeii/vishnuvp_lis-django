@@ -1,0 +1,133 @@
+{% extends 'base.html' %} {% block content %}
+
+<h1 class="page-title">Sample Collection</h1>
+
+<!-- Filter and Search Panel -->
+<div class="form-card mb-4" style="padding: 20px;">
+  <div class="form-card-title" style="font-size: 0.9rem; margin-bottom: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;">Search & Filter Worklist</div>
+  <form method="GET" class="row g-2">
+    <div class="col-md-5">
+      <input type="text" name="search" class="form-control" placeholder="Search by Patient Name or MRN..." value="{{ request.GET.search }}" />
+    </div>
+    <div class="col-md-3">
+      <select name="status" class="form-select">
+        <option value="" selected>All Sample Statuses</option>
+        <option value="1" {% if request.GET.status == '1' %}selected{% endif %}>Ordered</option>
+        <option value="2" {% if request.GET.status == '2' %}selected{% endif %}>Collected</option>
+        <option value="3" {% if request.GET.status == '3' %}selected{% endif %}>In-Lab</option>
+        <option value="4" {% if request.GET.status == '4' %}selected{% endif %}>Completed</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <input type="date" name="date" class="form-control" value="{{ request.GET.date }}" />
+    </div>
+    <div class="col-md-2">
+      <button class="btn-premium btn-premium-secondary w-100" style="padding: 10px;" type="submit">Filter</button>
+    </div>
+  </form>
+</div>
+
+<!-- Record Sample Collection Panel -->
+<div class="form-card mb-4">
+  <div class="form-card-title">Record Sample Collection</div>
+  <form method="POST">
+    {% csrf_token %}
+
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Lab Order <span style="color: var(--danger);">*</span></label>
+        <select name="order" class="form-select" required>
+          <option value="" disabled selected>Select Pending Order...</option>
+          {% for order in orders %}
+          <option value="{{ order.id }}">
+            Order #{{ order.id }} - {{ order.patient.first_name }} {{ order.patient.last_name }} (MRN: {{ order.patient.mrn }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Collected By <span style="color: var(--danger);">*</span></label>
+        <select name="collected_by" class="form-select" required>
+          {% for phleb in phlebotomists %}
+          <option value="{{ phleb.id }}" {% if phleb.id == request.user.id %}selected{% endif %}>{{ phleb.username }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Sample Condition <span style="color: var(--danger);">*</span></label>
+        <select name="condition" class="form-select" required>
+          <option value="good" selected>Good</option>
+          <option value="damaged">Damaged</option>
+          <option value="hemolyzed">Hemolyzed</option>
+        </select>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-premium btn-premium-primary" style="padding: 10px 24px; font-weight: 600;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;">
+        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+      Collect Sample
+    </button>
+  </form>
+</div>
+
+<!-- Samples Collection Logs Table -->
+<div class="table-wrapper">
+  <div class="table-title-area">
+    <div class="table-title">Sample Collection Logs</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table-premium">
+      <thead>
+        <tr>
+          <th>Sample ID</th>
+          <th>Patient Name</th>
+          <th>MRN</th>
+          <th>Collected By</th>
+          <th>Collected At</th>
+          <th>Status</th>
+          <th>Condition</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for sample in samples %}
+        <tr>
+          <td><span class="code-mrn" style="color: var(--accent-blue);">{{ sample.sample_id }}</span></td>
+          <td><strong style="color: var(--text-primary); font-weight: 600;">{{ sample.order.patient.first_name }} {{ sample.order.patient.last_name }}</strong></td>
+          <td><span class="code-mrn">{{ sample.order.patient.mrn }}</span></td>
+          <td>{{ sample.collected_by.username }}</td>
+          <td><span style="color: var(--text-secondary); font-size: 0.82rem;">{{ sample.collection_date|date:"Y-m-d H:i" }}</span></td>
+          <td>
+            {% if sample.order.status == 4 %}
+              <span class="badge-premium badge-status-completed">Completed</span>
+            {% elif sample.order.status == 3 %}
+              <span class="badge-premium badge-status-processing">In-Lab</span>
+            {% elif sample.order.status == 2 %}
+              <span class="badge-premium badge-status-collected" style="background-color: rgba(99, 102, 241, 0.08); color: #6366F1; border-color: rgba(99, 102, 241, 0.15);">Collected</span>
+            {% else %}
+              <span class="badge-premium badge-status-collected">Ordered</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if sample.sample_condition == 'good' %}
+              <span style="color: var(--success); font-weight: 600;">Good</span>
+            {% else %}
+              <span style="color: var(--warning); font-weight: 600;">{{ sample.sample_condition|title }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 32px; font-size: 0.82rem;">No sample collection logs found matching current filters.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

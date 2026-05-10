@@ -12,11 +12,10 @@ class LabOrder(models.Model):
         ('stat', 'STAT'),
     )
     STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('sample_collected', 'Sample Collected'),
-        ('processing', 'Processing'),
-        ('completed', 'Completed'),
-        ('cancelled', 'Cancelled'),
+        (1, 'Ordered'),
+        (2, 'Collected'),
+        (3, 'In-Lab'),
+        (4, 'Completed'),
     )
     patient = models.ForeignKey(
         Patient,
@@ -31,6 +30,7 @@ class LabOrder(models.Model):
     )
     tests = models.ManyToManyField(
         LabTest,
+        through='OrderLine',
         related_name='orders'
     )
     priority = models.CharField(
@@ -38,10 +38,9 @@ class LabOrder(models.Model):
         choices=PRIORITY_CHOICES,
         default='normal'
     )
-    status = models.CharField(
-        max_length=30,
+    status = models.IntegerField(
         choices=STATUS_CHOICES,
-        default='pending'
+        default=1
     )
     clinical_notes = models.TextField(
         blank=True,
@@ -55,3 +54,12 @@ class LabOrder(models.Model):
     )
     def __str__(self):
         return f"Order #{self.id} - {self.patient}"
+
+class OrderLine(models.Model):
+    order = models.ForeignKey(LabOrder, on_delete=models.CASCADE)
+    assay = models.ForeignKey(LabTest, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"OrderLine {self.id} - Order {self.order.id} - Assay {self.assay.id}"

@@ -1,0 +1,88 @@
+/* LIS Premium Minimalist Design System - Forms & Inputs */
+
+.form-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: inline-block;
+  letter-spacing: 0.02em;
+}
+
+.form-control, .form-select {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background-color: var(--bg-color);
+  background-clip: padding-box;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Custom dropdown select icon */
+.form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%239CA3AF' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px 12px;
+  padding-right: 40px;
+}
+
+.form-control:focus, .form-select:focus {
+  color: var(--text-primary);
+  background-color: var(--bg-color);
+  border-color: rgba(255, 255, 255, 0.2);
+  outline: 0;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.form-control::placeholder {
+  color: #52525B;
+  opacity: 1;
+}
+
+/* Rounded card form layout wrapper */
+.form-card {
+  background-color: var(--card-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 28px;
+}
+
+.form-card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+/* Row-based form structures */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -10px;
+  margin-left: -10px;
+}
+
+.form-col {
+  padding-right: 10px;
+  padding-left: 10px;
+  flex: 1 0 0%;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 767.98px) {
+  .form-col {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}

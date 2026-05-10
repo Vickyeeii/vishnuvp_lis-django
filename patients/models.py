@@ -1,5 +1,14 @@
 from django.db import models
+from django.core.exceptions import ValidationError
+from datetime import date
 
+def validate_dob(value):
+    today = date.today()
+    if value > today:
+        raise ValidationError("Date of birth cannot be in the future.")
+    age = today.year - value.year - ((today.month, today.day) < (value.month, value.day))
+    if age < 0 or age > 150:
+        raise ValidationError(f"Invalid age ({age} years). Age must be between 0 and 150 years.")
 
 class Patient(models.Model):
 
@@ -18,7 +27,7 @@ class Patient(models.Model):
     last_name = models.CharField(
         max_length=100
     )
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(validators=[validate_dob])
     gender = models.CharField(
         max_length=10,
         choices=GENDER_CHOICES

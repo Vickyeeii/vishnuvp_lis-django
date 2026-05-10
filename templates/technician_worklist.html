@@ -1,0 +1,172 @@
+{% extends 'base.html' %} {% block content %}
+
+<h1 class="page-title">Lab Technician Workdesk</h1>
+
+<!-- SECTION 1: Pending In-Lab Reception -->
+<div class="table-wrapper" style="margin-bottom: 28px;">
+  <div class="table-title-area" style="border-bottom: 1px solid var(--border-color);">
+    <div class="table-title" style="color: var(--warning);">Pending In-Lab Reception (Mark In-Lab)</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table-premium">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Patient Name</th>
+          <th>Sample ID</th>
+          <th>Assays Ordered</th>
+          <th>Collected At</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in collected_orders %}
+        <tr>
+          <td><strong style="color: var(--text-primary); font-weight: 600;">#{{ order.id }}</strong></td>
+          <td>{{ order.patient.first_name }} {{ order.patient.last_name }}</td>
+          <td><span class="code-mrn" style="color: var(--accent-blue);">{{ order.sample.sample_id }}</span></td>
+          <td>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              {% for test in order.tests.all %}
+                <span class="badge-premium" style="background-color: rgba(255,255,255,0.04); border-color: var(--border-color); color: var(--text-secondary);">{{ test.test_name }}</span>
+              {% endfor %}
+            </div>
+          </td>
+          <td><span style="color: var(--text-secondary); font-size: 0.82rem;">{{ order.sample.collection_date|date:"Y-m-d H:i" }}</span></td>
+          <td>
+            <form method="POST" style="display: inline;">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="mark_in_lab" />
+              <input type="hidden" name="order_id" value="{{ order.id }}" />
+              <button type="submit" class="btn-premium btn-premium-warning" style="padding: 4px 12px; font-size: 0.8rem; font-weight: 600;">Receive In Lab</button>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 24px; font-size: 0.82rem;">No collected samples pending reception in the lab.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 2: Active In-Lab Samples (Result Entry Desk) -->
+<div class="form-card mb-4" style="border: 1px solid rgba(59, 130, 246, 0.2);">
+  <div class="form-card-title" style="color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+    <span style="display: inline-block; width: 8px; height: 8px; background-color: var(--accent-blue); border-radius: 50%;"></span>
+    <span>In-Lab Processing (Result Entry Desk)</span>
+  </div>
+  
+  {% for order in processing_orders %}
+  <div class="clinical-card mb-3" style="padding: 20px; border: 1px solid var(--border-color); background-color: rgba(255, 255, 255, 0.01);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+      <div>
+        <span class="badge-premium badge-status-processing" style="margin-right: 8px;">IN-LAB</span>
+        <strong style="color: var(--text-primary);">Order #{{ order.id }}</strong> — Patient: <strong style="color: var(--text-primary);">{{ order.patient.first_name }} {{ order.patient.last_name }}</strong>
+      </div>
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">Sample ID: <span class="code-mrn" style="color: var(--accent-blue);">{{ order.sample.sample_id }}</span></span>
+    </div>
+
+    <!-- Multi-Assay Result Form -->
+    <form method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="enter_results" />
+      <input type="hidden" name="order_id" value="{{ order.id }}" />
+
+      <div class="row">
+        {% for test in order.tests.all %}
+        <div class="col-md-6 mb-3">
+          <div class="form-card" style="padding: 20px; background-color: var(--bg-color);">
+            <h6 style="color: var(--accent-blue); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 14px; font-size: 0.85rem; font-weight: 600;">Assay: {{ test.test_name }} ({{ test.test_code }})</h6>
+            
+            <div class="mb-3">
+              <label class="form-label">Result Value <span style="color: var(--danger);">*</span></label>
+              <input type="text" name="result_value_{{ test.id }}" class="form-control" placeholder="e.g. 14.2 g/dL, Positive" required />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Flag</label>
+              <select name="flag_{{ test.id }}" class="form-select">
+                <option value="normal" selected>Normal</option>
+                <option value="high">High</option>
+                <option value="low">Low</option>
+                <option value="critical">Critical</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="form-label">Remarks / Reference Notes</label>
+              <input type="text" name="remarks_{{ test.id }}" class="form-control" placeholder="Optional notes..." />
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn-premium btn-premium-success" style="padding: 8px 20px; font-weight: 600;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Save & Complete Order Results
+      </button>
+    </form>
+  </div>
+  {% empty %}
+  <p style="text-align: center; color: var(--text-secondary); padding: 32px; font-size: 0.82rem; margin: 0;">No samples are currently in processing. Mark collected samples "In-Lab" to begin result entries.</p>
+  {% endfor %}
+</div>
+
+<!-- SECTION 3: Completed Lab Results History -->
+<div class="table-wrapper">
+  <div class="table-title-area">
+    <div class="table-title">Completed Results Archive</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table-premium">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Patient Name</th>
+          <th>Assay Name</th>
+          <th>Result Value</th>
+          <th>Flag</th>
+          <th>Remarks</th>
+          <th>Entered By</th>
+          <th>Date Completed</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for result in results %}
+        <tr>
+          <td><strong style="color: var(--text-primary); font-weight: 600;">#{{ result.order.id }}</strong></td>
+          <td>{{ result.order.patient.first_name }} {{ result.order.patient.last_name }}</td>
+          <td>{{ result.test.test_name }}</td>
+          <td><strong style="color: var(--accent-blue);">{{ result.result_value }}</strong></td>
+          <td>
+            {% if result.flag == 'critical' %}
+              <span class="badge-premium badge-priority-stat">Critical</span>
+            {% elif result.flag == 'high' %}
+              <span class="badge-premium badge-priority-urgent">High</span>
+            {% elif result.flag == 'low' %}
+              <span class="badge-premium badge-priority-normal">Low</span>
+            {% else %}
+              <span class="badge-premium" style="background-color: rgba(255,255,255,0.04); border-color: var(--border-color); color: var(--text-secondary);">Normal</span>
+            {% endif %}
+          </td>
+          <td>{{ result.remarks|default:"—" }}</td>
+          <td>{{ result.entered_by.username }}</td>
+          <td><span style="color: var(--text-secondary); font-size: 0.82rem;">{{ result.created_at|date:"Y-m-d H:i" }}</span></td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" style="text-align: center; color: var(--text-secondary); padding: 32px; font-size: 0.82rem;">No finalized results found in archive.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

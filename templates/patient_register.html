@@ -1,0 +1,67 @@
+{% extends 'base.html' %} {% block content %}
+
+<h1 class="page-title">Patient Registration</h1>
+
+<div class="form-card">
+  <div class="form-card-title">Register New Clinical Record</div>
+  
+  <form method="POST">
+    {% csrf_token %}
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">MRN (Medical Record Number) <span style="color: var(--danger);">*</span></label>
+        <input type="text" name="mrn" class="form-control" placeholder="e.g. MRN-1001" required />
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Date of Birth <span style="color: var(--danger);">*</span></label>
+        <input type="date" name="date_of_birth" class="form-control" required />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">First Name <span style="color: var(--danger);">*</span></label>
+        <input type="text" name="first_name" class="form-control" placeholder="John" required />
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Last Name <span style="color: var(--danger);">*</span></label>
+        <input type="text" name="last_name" class="form-control" placeholder="Doe" required />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Gender <span style="color: var(--danger);">*</span></label>
+        <select name="gender" class="form-select" required>
+          <option value="male" selected>Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Phone Number <span style="color: var(--danger);">*</span></label>
+        <input type="text" name="phone_number" class="form-control" placeholder="e.g. 9876543210" required />
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label class="form-label">Residential Address <span style="color: var(--danger);">*</span></label>
+      <textarea name="address" class="form-control" rows="3" placeholder="Enter patient residential address..." required style="resize: none;"></textarea>
+    </div>
+
+    <button type="submit" class="btn-premium btn-premium-primary" style="padding: 10px 24px; font-weight: 600;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+        <polyline points="17 21 17 13 7 13 7 21"/>
+        <polyline points="7 3 7 8 15 8"/>
+      </svg>
+      Register Patient
+    </button>
+  </form>
+</div>
+
+{% endblock %}

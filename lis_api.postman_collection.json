@@ -1,0 +1,339 @@
+{
+  "info": {
+    "name": "LIS API v1 Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "JWT Authentication",
+      "item": [
+        {
+          "name": "Obtain Token (Login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/auth/token/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "auth", "token", ""]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"<refresh_token_here>\"\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/auth/token/refresh/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "auth", "token", "refresh", ""]
+            }
+          }
+        },
+        {
+          "name": "Logout Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer <access_token_here>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"<refresh_token_here>\"\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/auth/logout/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "auth", "logout", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Patients Desk",
+      "item": [
+        {
+          "name": "List Patients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <access_token_here>"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/patients/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "patients", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer <access_token_here>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mrn\": \"MRN-9000\",\n  \"first_name\": \"Test\",\n  \"last_name\": \"Patient\",\n  \"gender\": \"male\",\n  \"date_of_birth\": \"1990-01-01\",\n  \"phone_number\": \"9876543220\",\n  \"address\": \"Test Address\"\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/patients/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "patients", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Assays Menu",
+      "item": [
+        {
+          "name": "List Assays",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <access_token_here>"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/tests/assays/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "tests", "assays", ""]
+            }
+          }
+        },
+        {
+          "name": "List Categories (Menus)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <access_token_here>"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/tests/menus/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "tests", "menus", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders Desk",
+      "item": [
+        {
+          "name": "List Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <access_token_here>"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/orders/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "orders", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer <access_token_here>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient\": 1,\n  \"physician\": 4,\n  \"priority\": \"normal\",\n  \"clinical_notes\": \"Routine tests\",\n  \"tests\": [1, 2]\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/orders/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "orders", ""]
+            }
+          }
+        },
+        {
+          "name": "Collect Sample",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <access_token_here>"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/orders/1/collect/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "orders", "1", "collect", ""]
+            }
+          }
+        },
+        {
+          "name": "Receive Sample In-Lab",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <access_token_here>"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/orders/1/receive/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "orders", "1", "receive", ""]
+            }
+          }
+        },
+        {
+          "name": "Enter Results",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer <access_token_here>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"test\": 1,\n  \"result_value\": \"14.5\",\n  \"normal_range\": \"12-15\",\n  \"unit\": \"g/dL\",\n  \"flag\": \"normal\",\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/orders/1/results/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "orders", "1", "results", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <access_token_here>"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/orders/1/report/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "orders", "1", "report", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Results Archives",
+      "item": [
+        {
+          "name": "List Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <access_token_here>"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/results/",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "results", ""]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

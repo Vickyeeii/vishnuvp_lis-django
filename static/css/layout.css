@@ -1,0 +1,183 @@
+/* LIS Premium Minimalist Design System - Scaffolding & Layouts */
+
+/* Core Layout Container */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Slim, Fixed Sidebar Panel */
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  background-color: var(--sidebar-color);
+  position: fixed;
+  left: 0;
+  top: 0;
+  padding: 28px 16px;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  transition: transform var(--transition-fast);
+}
+
+.sidebar-brand {
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 12px;
+}
+
+.sidebar-brand svg {
+  color: var(--accent-blue);
+}
+
+.sidebar-role-badge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 12px 18px 12px;
+  margin-bottom: 18px;
+}
+
+.sidebar-role-badge strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-grow: 1;
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 9px 12px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-nav a:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
+}
+
+.sidebar-nav a.active {
+  background-color: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.sidebar-footer a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 9px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+/* Flexible Main Content Wrapper */
+.content-wrapper {
+  margin-left: 240px;
+  flex-grow: 1;
+  min-width: 0;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Mobile responsive hamburger header */
+.mobile-header {
+  display: none;
+  background-color: var(--sidebar-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 16px;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+}
+
+.mobile-brand {
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 4px;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 991.98px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.active {
+    transform: translateX(0);
+  }
+  .content-wrapper {
+    margin-left: 0;
+    padding: 24px 16px;
+  }
+  .mobile-header {
+    display: flex;
+  }
+  .sidebar-close-btn {
+    display: flex !important;
+    position: absolute;
+    right: 16px;
+    top: 24px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+}

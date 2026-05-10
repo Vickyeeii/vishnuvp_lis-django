@@ -1,0 +1,34 @@
+<!-- Premium Minimalist Top Navbar -->
+<header class="mobile-header">
+  <div class="mobile-brand">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);">
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+    </svg>
+    <span>LIS Workspace</span>
+  </div>
+  <button class="mobile-toggle-btn" id="mobileToggleBtn">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</header>
+
+<nav class="d-print-none" style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; border-bottom: 1px solid var(--border-color); margin-bottom: 32px;">
+  <div>
+    <h2 style="font-size: 1.15rem; font-weight: 600; color: var(--text-primary); letter-spacing: -0.02em;">
+      Laboratory Information System
+    </h2>
+  </div>
+  
+  {% if request.user.is_authenticated %}
+    <div style="display: flex; align-items: center; gap: 12px; font-size: 0.82rem; color: var(--text-secondary);">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="display: inline-block; width: 6px; height: 6px; background-color: var(--success); border-radius: 50%;"></span>
+        <span>Active Session:</span>
+        <strong style="color: var(--text-primary); font-weight: 500;">{{ request.user.username }}</strong>
+      </div>
+    </div>
+  {% endif %}
+</nav>
