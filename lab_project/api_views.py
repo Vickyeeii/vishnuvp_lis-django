@@ -94,6 +94,11 @@ class LabOrderViewSet(viewsets.ModelViewSet):
         serializer = ResultEntrySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(order=order)
+            
+            # Transition parent order to completed status
+            order.status = 4
+            order.save()
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
