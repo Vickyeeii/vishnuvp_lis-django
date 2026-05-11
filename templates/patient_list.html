@@ -2,6 +2,28 @@
 
 <h1 class="page-title">Patients Registry</h1>
 
+<div class="form-card mb-4" style="padding: 20px">
+  <form id="searchForm" class="row g-2">
+    <div class="col-md-9 col-8">
+      <input
+        type="text"
+        id="searchInput"
+        class="form-control"
+        placeholder="Search by Patient Name or MRN..."
+      />
+    </div>
+    <div class="col-md-3 col-4">
+      <button
+        class="btn-premium btn-premium-primary w-100"
+        style="padding: 10px"
+        type="submit"
+      >
+        Search Patients
+      </button>
+    </div>
+  </form>
+</div>
+
 <div class="table-wrapper">
   <div class="table-title-area">
     <div class="table-title">All Registered Patient Records</div>
@@ -15,27 +37,119 @@
           <th>Last Name</th>
           <th>Gender</th>
           <th>Phone Number</th>
+          <th style="text-align: right">Actions</th>
         </tr>
       </thead>
 
-      <tbody>
-        {% for patient in patients %}
+      <tbody id="patients-tbody">
         <tr>
-          <td><span class="code-mrn">{{ patient.mrn }}</span></td>
-          <td><strong style="color: var(--text-primary); font-weight: 600;">{{ patient.first_name }}</strong></td>
-          <td><strong style="color: var(--text-primary); font-weight: 600;">{{ patient.last_name }}</strong></td>
-          <td>{{ patient.gender|title }}</td>
-          <td>{{ patient.phone_number }}</td>
+          <td
+            colspan="6"
+            style="
+              text-align: center;
+              color: var(--text-secondary);
+              padding: 32px;
+              font-size: 0.82rem;
+            "
+          >
+            Loading patients...
+          </td>
         </tr>
-        {% empty %}
-        <tr>
-          <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 32px; font-size: 0.82rem;">No registered patient records found.</td>
-        </tr>
-        {% endfor %}
       </tbody>
     </table>
   </div>
-  {% include 'partials/pagination.html' with page_obj=patients page_param='page' %}
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const tbody = document.getElementById("patients-tbody");
+    const searchForm = document.getElementById("searchForm");
+    const searchInput = document.getElementById("searchInput");
+    const userRole = "{{ request.user.role }}"; // Inject role from Django context
+
+    // Make toggle function global so inline onclick handlers can reach it
+    window.toggleDetails = function (patId) {
+      const detailsRow = document.getElementById(`details-${patId}`);
+      if (detailsRow) {
+        if (detailsRow.style.display === "none") {
+          detailsRow.style.display = "table-row";
+        } else {
+          detailsRow.style.display = "none";
+        }
+      }
+    };
+
+    const fetchPatients = async (searchQuery = "") => {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 32px; font-size: 0.82rem;">Loading patients...</td></tr>`;
+      try {
+        const url = searchQuery
+          ? `/api/v1/patients/?search=${encodeURIComponent(searchQuery)}`
+          : "/api/v1/patients/";
+        const res = await api.get(url);
+        if (res.success) {
+          const patients = res.data.results || res.data;
+          if (patients.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 32px; font-size: 0.82rem;">No matching patient records found.</td></tr>`;
+          } else {
+            tbody.innerHTML = patients
+              .map((pat) => {
+                const reportsBtnHtml =
+                  userRole === "admin" || userRole === "physician"
+                    ? `<a href="/lab-report/?search=${pat.mrn}" class="btn-premium btn-premium-primary" style="padding: 4px 10px; font-size: 0.8rem; text-decoration: none; display: inline-block; margin-left: 8px;">View Reports</a>`
+                    : "";
+
+                return `
+              <tr>
+                <td><span class="code-mrn">${pat.mrn}</span></td>
+                <td><strong style="color: var(--text-primary); font-weight: 600;">${pat.first_name}</strong></td>
+                <td><strong style="color: var(--text-primary); font-weight: 600;">${pat.last_name}</strong></td>
+                <td>${pat.gender ? pat.gender.charAt(0).toUpperCase() + pat.gender.slice(1) : ""}</td>
+                <td>${pat.phone_number || ""}</td>
+                <td style="text-align: right;">
+                  <button onclick="toggleDetails(${pat.id})" class="btn-premium btn-premium-secondary" style="padding: 4px 10px; font-size: 0.8rem;">Details</button>
+                  ${reportsBtnHtml}
+                </td>
+              </tr>
+              <tr id="details-${pat.id}" style="display: none; background-color: var(--bg-card); border-bottom: 2px solid var(--border-color);">
+                <td colspan="6" style="padding: 24px;">
+                  <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 0.05em;"></div>
+                  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div>
+                      <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Date of Birth</div>
+                      <div style="font-size: 0.9rem; font-weight: 500; color: var(--text-primary);">${pat.date_of_birth || "—"}</div>
+                    </div>
+                    <div>
+                      <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Age</div>
+                      <div style="font-size: 0.9rem; font-weight: 500; color: var(--text-primary);">${pat.age !== undefined ? pat.age + " yrs" : "56 yrs"}</div>
+                    </div>
+                    <div style="grid-column: span 2;">
+                      <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Full Address</div>
+                      <div style="font-size: 0.9rem; font-weight: 500; color: var(--text-primary);">${pat.address || "—"}</div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            `;
+              })
+              .join("");
+          }
+        } else {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--danger); padding: 32px;">Failed to load data.</td></tr>`;
+        }
+      } catch (err) {
+        console.error(err);
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--danger); padding: 32px;">Network error.</td></tr>`;
+      }
+    };
+
+    searchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      fetchPatients(searchInput.value);
+    });
+
+    // Initial fetch
+    fetchPatients();
+  });
+</script>
 
 {% endblock %}

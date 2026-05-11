@@ -7,23 +7,22 @@
   <div class="col-md-4 mb-4">
     <div class="form-card">
       <div class="form-card-title">Create User Account</div>
-      <form method="POST">
+      <form id="createUserForm">
         {% csrf_token %}
-        <input type="hidden" name="action" value="create_user" />
 
         <div class="mb-3">
           <label class="form-label">Username <span style="color: var(--danger);">*</span></label>
-          <input type="text" name="username" class="form-control" placeholder="e.g. john_nurse" required />
+          <input type="text" name="username" id="username" class="form-control" placeholder="e.g. john_nurse" required />
         </div>
 
         <div class="mb-3">
           <label class="form-label">Password <span style="color: var(--danger);">*</span></label>
-          <input type="password" name="password" class="form-control" placeholder="••••••••" required />
+          <input type="password" name="password" id="password" class="form-control" placeholder="••••••••" required />
         </div>
 
         <div class="mb-3">
           <label class="form-label">System Role <span style="color: var(--danger);">*</span></label>
-          <select name="role" class="form-select" required>
+          <select name="role" id="role" class="form-select" required>
             <option value="admin">System Admin</option>
             <option value="nurse" selected>Nurse</option>
             <option value="physician">Physician</option>
@@ -34,10 +33,10 @@
 
         <div class="mb-4">
           <label class="form-label">Phone Number</label>
-          <input type="text" name="phone_number" class="form-control" placeholder="e.g. 9876543210" />
+          <input type="text" name="phone_number" id="phone_number" class="form-control" placeholder="e.g. 9876543210" />
         </div>
 
-        <button type="submit" class="btn-premium btn-premium-primary w-100" style="padding: 10px; font-weight: 600;">
+        <button type="submit" id="userSubmitBtn" class="btn-premium btn-premium-primary w-100" style="padding: 10px; font-weight: 600;">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;">
             <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
             <circle cx="8.5" cy="7" r="4"/>
@@ -93,16 +92,11 @@
                 {% endif %}
               </td>
               <td style="text-align: center;">
-                <form method="POST" style="display: inline;">
-                  {% csrf_token %}
-                  <input type="hidden" name="action" value="toggle_user" />
-                  <input type="hidden" name="staff_id" value="{{ staff.id }}" />
                   {% if staff.is_active %}
-                    <button type="submit" class="btn-premium btn-premium-danger" style="padding: 2px 10px; font-size: 0.75rem;">Disable Account</button>
+                    <button class="btn-premium btn-premium-danger toggle-user-btn" data-id="{{ staff.id }}" data-status="true" style="padding: 2px 10px; font-size: 0.75rem;">Disable Account</button>
                   {% else %}
-                    <button type="submit" class="btn-premium btn-premium-success" style="padding: 2px 10px; font-size: 0.75rem;">Enable Account</button>
+                    <button class="btn-premium btn-premium-success toggle-user-btn" data-id="{{ staff.id }}" data-status="false" style="padding: 2px 10px; font-size: 0.75rem;">Enable Account</button>
                   {% endif %}
-                </form>
               </td>
             </tr>
             {% endfor %}
@@ -113,5 +107,67 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Create User
+    const createUserForm = document.getElementById('createUserForm');
+    if (createUserForm) {
+      createUserForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const data = {
+          username: document.getElementById('username').value,
+          password: document.getElementById('password').value,
+          role: document.getElementById('role').value,
+          phone_number: document.getElementById('phone_number').value
+        };
+        
+        const btn = document.getElementById('userSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = 'Processing...';
+
+        try {
+          const res = await api.post('/api/v1/users/', data);
+          if (res.success) {
+            alert('User registered successfully via API!');
+            window.location.reload();
+          } else {
+            console.error(res.data);
+            alert('Failed to register user: ' + JSON.stringify(res.data));
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = 'Register Account';
+        }
+      });
+    }
+
+    // 2. Toggle Account Status
+    document.querySelectorAll('.toggle-user-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        const isCurrentlyActive = btn.getAttribute('data-status') === 'true';
+        const newStatus = !isCurrentlyActive;
+        
+        btn.disabled = true;
+        try {
+          const res = await api.patch(`/api/v1/users/${id}/`, { is_active: newStatus });
+          if (res.success) {
+            window.location.reload();
+          } else {
+            alert('Failed to update account status.');
+            btn.disabled = false;
+          }
+        } catch (err) {
+          console.error(err);
+          btn.disabled = false;
+        }
+      });
+    });
+  });
+</script>
 
 {% endblock %}

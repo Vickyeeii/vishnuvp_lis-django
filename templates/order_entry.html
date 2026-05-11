@@ -262,10 +262,41 @@ document.addEventListener("DOMContentLoaded", function() {
     selectElement.selectedIndex = 0;
   });
 
-  form.addEventListener("submit", function(e) {
+  form.addEventListener("submit", async function(e) {
+    e.preventDefault(); // Prevent native submission
     if (selectedAssays.length === 0) {
-      e.preventDefault();
       alert("Please add at least one assay (test) to the order list before submitting.");
+      return;
+    }
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = 'Processing...';
+    submitBtn.disabled = true;
+
+    const data = {
+      patient: document.querySelector('select[name="patient"]').value,
+      physician: document.querySelector('select[name="physician"]').value,
+      priority: document.querySelector('select[name="priority"]').value,
+      clinical_notes: document.querySelector('textarea[name="clinical_notes"]').value,
+      tests: selectedAssays.map(a => parseInt(a.id))
+    };
+
+    try {
+      const res = await api.post('/api/v1/orders/', data);
+      if (res.success) {
+        alert('Lab order created successfully via API!');
+        window.location.reload();
+      } else {
+        console.error(res.data);
+        alert('Failed to create order: ' + JSON.stringify(res.data));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error occurred.');
+    } finally {
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
     }
   });
 });

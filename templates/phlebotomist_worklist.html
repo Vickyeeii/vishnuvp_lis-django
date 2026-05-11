@@ -30,13 +30,13 @@
 <!-- Record Sample Collection Panel -->
 <div class="form-card mb-4">
   <div class="form-card-title">Record Sample Collection</div>
-  <form method="POST">
+  <form id="collectForm">
     {% csrf_token %}
 
     <div class="row">
       <div class="col-md-4 mb-3">
         <label class="form-label">Lab Order <span style="color: var(--danger);">*</span></label>
-        <select name="order" class="form-select" required>
+        <select name="order" id="order" class="form-select" required>
           <option value="" disabled selected>Select Pending Order...</option>
           {% for order in orders %}
           <option value="{{ order.id }}">
@@ -48,7 +48,7 @@
 
       <div class="col-md-4 mb-3">
         <label class="form-label">Collected By <span style="color: var(--danger);">*</span></label>
-        <select name="collected_by" class="form-select" required>
+        <select name="collected_by" id="collected_by" class="form-select" required>
           {% for phleb in phlebotomists %}
           <option value="{{ phleb.id }}" {% if phleb.id == request.user.id %}selected{% endif %}>{{ phleb.username }}</option>
           {% endfor %}
@@ -57,7 +57,7 @@
 
       <div class="col-md-4 mb-3">
         <label class="form-label">Sample Condition <span style="color: var(--danger);">*</span></label>
-        <select name="condition" class="form-select" required>
+        <select name="condition" id="condition" class="form-select" required>
           <option value="good" selected>Good</option>
           <option value="damaged">Damaged</option>
           <option value="hemolyzed">Hemolyzed</option>
@@ -65,13 +65,53 @@
       </div>
     </div>
 
-    <button type="submit" class="btn-premium btn-premium-primary" style="padding: 10px 24px; font-weight: 600;">
+    <button type="submit" id="collectBtn" class="btn-premium btn-premium-primary" style="padding: 10px 24px; font-weight: 600;">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;">
         <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
       </svg>
       Collect Sample
     </button>
   </form>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const collectForm = document.getElementById('collectForm');
+    if (collectForm) {
+      collectForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const orderId = document.getElementById('order').value;
+        const data = {
+          collected_by: document.getElementById('collected_by').value,
+          condition: document.getElementById('condition').value
+        };
+        
+        const btn = document.getElementById('collectBtn');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = 'Processing...';
+
+        try {
+          const res = await api.patch(`/api/v1/orders/${orderId}/collect/`, data);
+          if (res.success) {
+            alert('Sample collected successfully via API!');
+            window.location.reload();
+          } else {
+            console.error(res.data);
+            alert('Failed to collect sample: ' + JSON.stringify(res.data));
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Network error occurred.');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      });
+    }
+  });
+</script>
 </div>
 
 <!-- Samples Collection Logs Table -->

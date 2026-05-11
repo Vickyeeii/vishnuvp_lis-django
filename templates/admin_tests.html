@@ -7,18 +7,44 @@
   <div class="col-md-4 mb-4">
     <div class="form-card h-100">
       <div class="form-card-title">Create Test Category</div>
-      <form method="POST">
+      <form id="createCategoryForm">
         {% csrf_token %}
-        <input type="hidden" name="action" value="create_category" />
         <div class="mb-3">
-          <label class="form-label">Category Name <span style="color: var(--danger);">*</span></label>
-          <input type="text" name="name" class="form-control" placeholder="e.g. Hematology, Biochemistry" required />
+          <label class="form-label"
+            >Category Name <span style="color: var(--danger)">*</span></label
+          >
+          <input
+            type="text"
+            name="name"
+            id="cat_name"
+            class="form-control"
+            placeholder="e.g. Hematology, Biochemistry"
+            required
+          />
         </div>
-        <button type="submit" class="btn-premium btn-premium-primary w-100" style="padding: 10px; font-weight: 600;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;">
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-            <polyline points="17 21 17 13 7 13 7 21"/>
-            <polyline points="7 3 7 8 15 8"/>
+        <button
+          type="submit"
+          id="catSubmitBtn"
+          class="btn-premium btn-premium-primary w-100"
+          style="padding: 10px; font-weight: 600"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="vertical-align: middle; margin-right: 6px"
+          >
+            <path
+              d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+            />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
           </svg>
           Save Category
         </button>
@@ -30,33 +56,64 @@
   <div class="col-md-8 mb-4">
     <div class="form-card h-100">
       <div class="form-card-title">Create Lab Assay (Test)</div>
-      <form method="POST">
+      <form id="createAssayForm">
         {% csrf_token %}
-        <input type="hidden" name="action" value="create_assay" />
         <div class="row">
           <div class="col-md-6 mb-3">
-            <label class="form-label">Assay Name <span style="color: var(--danger);">*</span></label>
-            <input type="text" name="test_name" class="form-control" placeholder="e.g. Hemoglobin, Lipid Profile" required />
+            <label class="form-label"
+              >Assay Name <span style="color: var(--danger)">*</span></label
+            >
+            <input
+              type="text"
+              name="test_name"
+              id="test_name"
+              class="form-control"
+              placeholder="e.g. Hemoglobin, Lipid Profile"
+              required
+            />
           </div>
           <div class="col-md-6 mb-3">
-            <label class="form-label">Assay Code <span style="color: var(--danger);">*</span></label>
-            <input type="text" name="test_code" class="form-control" placeholder="e.g. HB01, LIPID" required />
+            <label class="form-label"
+              >Assay Code <span style="color: var(--danger)">*</span></label
+            >
+            <input
+              type="text"
+              name="test_code"
+              id="test_code"
+              class="form-control"
+              placeholder="e.g. HB01, LIPID"
+              required
+            />
           </div>
         </div>
 
         <div class="row">
           <div class="col-md-6 mb-3">
-            <label class="form-label">Category <span style="color: var(--danger);">*</span></label>
-            <select name="category_id" class="form-select" required>
+            <label class="form-label"
+              >Category <span style="color: var(--danger)">*</span></label
+            >
+            <select
+              name="category_id"
+              id="category_id"
+              class="form-select"
+              required
+            >
               <option value="" disabled selected>Select Category</option>
               {% for cat in categories %}
-                <option value="{{ cat.id }}">{{ cat.name }}</option>
+              <option value="{{ cat.id }}">{{ cat.name }}</option>
               {% endfor %}
             </select>
           </div>
           <div class="col-md-6 mb-3">
-            <label class="form-label">Sample Type <span style="color: var(--danger);">*</span></label>
-            <select name="sample_type" class="form-select" required>
+            <label class="form-label"
+              >Sample Type <span style="color: var(--danger)">*</span></label
+            >
+            <select
+              name="sample_type"
+              id="sample_type"
+              class="form-select"
+              required
+            >
               <option value="blood" selected>Blood</option>
               <option value="urine">Urine</option>
               <option value="stool">Stool</option>
@@ -68,25 +125,70 @@
 
         <div class="row">
           <div class="col-md-6 mb-3">
-            <label class="form-label">Price ($) <span style="color: var(--danger);">*</span></label>
-            <input type="number" step="0.01" name="price" class="form-control" placeholder="e.g. 45.00" required />
+            <label class="form-label"
+              >Price ($) <span style="color: var(--danger)">*</span></label
+            >
+            <input
+              type="number"
+              step="0.01"
+              name="price"
+              id="price"
+              class="form-control"
+              placeholder="e.g. 45.00"
+              required
+            />
           </div>
           <div class="col-md-6 mb-3">
-            <label class="form-label">Turnaround Time <span style="color: var(--danger);">*</span></label>
-            <input type="text" name="turnaround_time" class="form-control" placeholder="e.g. 24 Hours, 2 Hours" required />
+            <label class="form-label"
+              >Turnaround Time
+              <span style="color: var(--danger)">*</span></label
+            >
+            <input
+              type="text"
+              name="turnaround_time"
+              id="turnaround_time"
+              class="form-control"
+              placeholder="e.g. 24 Hours, 2 Hours"
+              required
+            />
           </div>
         </div>
 
         <div class="mb-3">
           <label class="form-label">Description</label>
-          <textarea name="description" class="form-control" rows="1" placeholder="Optional clinical details..." style="resize: none;"></textarea>
+          <textarea
+            name="description"
+            id="description"
+            class="form-control"
+            rows="1"
+            placeholder="Optional clinical details..."
+            style="resize: none"
+          ></textarea>
         </div>
 
-        <button type="submit" class="btn-premium btn-premium-primary" style="padding: 10px 24px; font-weight: 600;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;">
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-            <polyline points="17 21 17 13 7 13 7 21"/>
-            <polyline points="7 3 7 8 15 8"/>
+        <button
+          type="submit"
+          id="assaySubmitBtn"
+          class="btn-premium btn-premium-primary"
+          style="padding: 10px 24px; font-weight: 600"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="vertical-align: middle; margin-right: 6px"
+          >
+            <path
+              d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+            />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
           </svg>
           Save Assay
         </button>
@@ -96,12 +198,25 @@
 </div>
 
 <!-- Assays List with Search -->
-<div class="table-wrapper" style="margin-top: 12px;">
+<div class="table-wrapper" style="margin-top: 12px">
   <div class="table-title-area">
     <div class="table-title">All Active & Inactive Assays</div>
-    <form method="GET" style="display: flex; width: 320px; gap: 8px;">
-      <input type="text" name="search" class="form-control" placeholder="Search test name or code..." value="{{ request.GET.search }}" style="padding: 6px 12px; font-size: 0.8rem;" />
-      <button class="btn-premium btn-premium-secondary" style="padding: 6px 14px; font-size: 0.8rem;" type="submit">Search</button>
+    <form method="GET" style="display: flex; width: 320px; gap: 8px">
+      <input
+        type="text"
+        name="search"
+        class="form-control"
+        placeholder="Search test name or code..."
+        value="{{ request.GET.search }}"
+        style="padding: 6px 12px; font-size: 0.8rem"
+      />
+      <button
+        class="btn-premium btn-premium-secondary"
+        style="padding: 6px 14px; font-size: 0.8rem"
+        type="submit"
+      >
+        Search
+      </button>
     </form>
   </div>
 
@@ -116,43 +231,72 @@
           <th>Price</th>
           <th>TAT</th>
           <th>Status</th>
-          <th style="text-align: center;">Actions</th>
+          <th style="text-align: center">Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for test in tests %}
         <tr>
           <td><span class="code-mrn">{{ test.test_code }}</span></td>
-          <td><strong style="color: var(--text-primary); font-weight: 600;">{{ test.test_name }}</strong></td>
+          <td>
+            <strong style="color: var(--text-primary); font-weight: 600"
+              >{{ test.test_name }}</strong
+            >
+          </td>
           <td>{{ test.category.name }}</td>
-          <td><span class="badge-premium" style="background-color: rgba(255,255,255,0.03); border-color: var(--border-color); color: var(--text-secondary);">{{ test.sample_type|upper }}</span></td>
-          <td><strong style="color: var(--accent-blue);">${{ test.price }}</strong></td>
+          <td>
+            <span
+              class="badge-premium"
+              style="
+                background-color: rgba(255, 255, 255, 0.03);
+                border-color: var(--border-color);
+                color: var(--text-secondary);
+              "
+              >{{ test.sample_type|upper }}</span
+            >
+          </td>
+          <td>
+            <strong style="color: var(--accent-blue)">${{ test.price }}</strong>
+          </td>
           <td>{{ test.turnaround_time }}</td>
           <td>
             {% if test.status == 'active' %}
-              <span class="badge-premium badge-status-completed">Active</span>
+            <span class="badge-premium badge-status-completed">Active</span>
             {% else %}
-              <span class="badge-premium badge-priority-stat">Inactive</span>
+            <span class="badge-premium badge-priority-stat">Inactive</span>
             {% endif %}
           </td>
-          <td style="text-align: center;">
-            <form method="POST" style="display: inline-block; margin-right: 4px;">
-              {% csrf_token %}
-              <input type="hidden" name="action" value="toggle_assay" />
-              <input type="hidden" name="test_id" value="{{ test.id }}" />
-              <button type="submit" class="btn-premium btn-premium-warning" style="padding: 2px 10px; font-size: 0.75rem;">Toggle Status</button>
-            </form>
-            <form method="POST" style="display: inline-block;">
-              {% csrf_token %}
-              <input type="hidden" name="action" value="delete_assay" />
-              <input type="hidden" name="test_id" value="{{ test.id }}" />
-              <button type="submit" class="btn-premium btn-premium-danger" style="padding: 2px 10px; font-size: 0.75rem;" onclick="return confirm('Are you sure you want to delete this assay?')">Delete</button>
-            </form>
+          <td style="text-align: center">
+            <button
+              class="btn-premium btn-premium-warning toggle-assay-btn"
+              data-id="{{ test.id }}"
+              data-status="{{ test.status }}"
+              style="padding: 2px 10px; font-size: 0.75rem"
+            >
+              Toggle Status
+            </button>
+            <button
+              class="btn-premium btn-premium-danger delete-assay-btn"
+              data-id="{{ test.id }}"
+              style="padding: 2px 10px; font-size: 0.75rem"
+            >
+              Delete
+            </button>
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="8" style="text-align: center; color: var(--text-secondary); padding: 32px; font-size: 0.82rem;">No assays match your current search.</td>
+          <td
+            colspan="8"
+            style="
+              text-align: center;
+              color: var(--text-secondary);
+              padding: 32px;
+              font-size: 0.82rem;
+            "
+          >
+            No assays match your current search.
+          </td>
         </tr>
         {% endfor %}
       </tbody>
@@ -160,5 +304,121 @@
   </div>
   {% include 'partials/pagination.html' with page_obj=tests page_param='page' %}
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // 1. Create Category
+    const categoryForm = document.getElementById("createCategoryForm");
+    if (categoryForm) {
+      categoryForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const data = { name: document.getElementById("cat_name").value };
+        const btn = document.getElementById("catSubmitBtn");
+        btn.disabled = true;
+        btn.innerHTML = "Processing...";
+
+        try {
+          const res = await api.post("/api/v1/tests/menus/", data);
+          if (res.success) {
+            alert("Category created successfull");
+            window.location.reload();
+          } else {
+            console.error(res.data);
+            alert("Failed to create category: " + JSON.stringify(res.data));
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = "Save Category";
+        }
+      });
+    }
+
+    // 2. Create Assay
+    const assayForm = document.getElementById("createAssayForm");
+    if (assayForm) {
+      assayForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const data = {
+          test_name: document.getElementById("test_name").value,
+          test_code: document.getElementById("test_code").value,
+          category: document.getElementById("category_id").value,
+          sample_type: document.getElementById("sample_type").value,
+          price: document.getElementById("price").value,
+          turnaround_time: document.getElementById("turnaround_time").value,
+          description: document.getElementById("description").value,
+        };
+        const btn = document.getElementById("assaySubmitBtn");
+        btn.disabled = true;
+        btn.innerHTML = "Processing...";
+
+        try {
+          const res = await api.post("/api/v1/tests/assays/", data);
+          if (res.success) {
+            alert("Assay created successfully via API!");
+            window.location.reload();
+          } else {
+            console.error(res.data);
+            alert("Failed to create assay: " + JSON.stringify(res.data));
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = "Save Assay";
+        }
+      });
+    }
+
+    // 3. Toggle Status
+    document.querySelectorAll(".toggle-assay-btn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-id");
+        const currentStatus = btn.getAttribute("data-status");
+        const newStatus = currentStatus === "active" ? "inactive" : "active";
+
+        btn.disabled = true;
+        try {
+          const res = await api.patch(`/api/v1/tests/assays/${id}/`, {
+            status: newStatus,
+          });
+          if (res.success) {
+            window.location.reload();
+          } else {
+            alert("Failed to update status.");
+            btn.disabled = false;
+          }
+        } catch (err) {
+          console.error(err);
+          btn.disabled = false;
+        }
+      });
+    });
+
+    // 4. Delete Assay
+    document.querySelectorAll(".delete-assay-btn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        if (!confirm("Are you sure you want to delete this assay?")) return;
+
+        const id = btn.getAttribute("data-id");
+        btn.disabled = true;
+
+        try {
+          const res = await api.delete(`/api/v1/tests/assays/${id}/`);
+          if (res.success) {
+            window.location.reload();
+          } else {
+            alert("Failed to delete assay.");
+            btn.disabled = false;
+          }
+        } catch (err) {
+          console.error(err);
+          btn.disabled = false;
+        }
+      });
+    });
+  });
+</script>
 
 {% endblock %}

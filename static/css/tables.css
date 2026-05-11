@@ -90,7 +90,13 @@
   border-color: rgba(245, 158, 11, 0.15);
 }
 
-.badge-priority-normal {
+.badge-priority-normal1 {
+  background-color: rgba(16, 185, 129, 0.08);
+  color: var(--success);
+  border-color: rgba(16, 185, 129, 0.15);
+}
+
+.badge-priority-lowb {
   background-color: rgba(59, 130, 246, 0.08);
   color: var(--accent-blue);
   border-color: rgba(59, 130, 246, 0.15);
@@ -121,6 +127,12 @@
   border-color: var(--border-color);
 }
 
+.badge-normal-state {
+  background-color: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
 /* Monospace code styling */
 .code-mrn {
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
@@ -130,4 +142,6 @@
   border-radius: 4px;
   color: var(--text-primary);
   border: 1px solid var(--border-color);
+  display: inline-block;
+  white-space: nowrap;
 }

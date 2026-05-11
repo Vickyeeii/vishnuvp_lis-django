@@ -12,6 +12,14 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'role', 'phone_number', 'is_active']
         extra_kwargs = {'password': {'write_only': True}}
 
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        user = super().create(validated_data)
+        if password:
+            user.set_password(password)
+            user.save()
+        return user
+
 
 class PatientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -78,3 +86,12 @@ class ResultEntrySerializer(serializers.ModelSerializer):
         if value.status != 3:
             raise serializers.ValidationError("Results can only be entered when the order is In-Lab (status 3).")
         return value
+
+
+class DetailedLabOrderSerializer(LabOrderSerializer):
+    sample = SampleCollectionSerializer(read_only=True)
+    results = ResultEntrySerializer(many=True, read_only=True)
+    patient = PatientSerializer(read_only=True)
+
+    class Meta(LabOrderSerializer.Meta):
+        fields = LabOrderSerializer.Meta.fields + ['sample', 'results', 'patient']

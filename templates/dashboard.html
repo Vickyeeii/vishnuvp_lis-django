@@ -16,19 +16,19 @@
 {% if request.user.role == 'admin' %}
 <div class="dashboard-grid">
   <div class="kpi-card">
-    <div class="kpi-value blue">{{ total_patients }}</div>
+    <div class="kpi-value blue" id="kpi-total-patients">-</div>
     <div class="kpi-label">Total Patients</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-value" style="color: #6366F1;">{{ total_orders }}</div>
+    <div class="kpi-value" style="color: #6366F1;" id="kpi-total-orders">-</div>
     <div class="kpi-label">Total Lab Orders</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-value warning">{{ pending_collections }}</div>
+    <div class="kpi-value warning" id="kpi-pending-collections">-</div>
     <div class="kpi-label">Pending Collections</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-value success">{{ completed_reports }}</div>
+    <div class="kpi-value success" id="kpi-completed-reports">-</div>
     <div class="kpi-label">Completed Reports</div>
   </div>
 </div>
@@ -36,11 +36,11 @@
 {% elif request.user.role == 'physician' or request.user.role == 'nurse' %}
 <div class="dashboard-grid-2">
   <div class="kpi-card">
-    <div class="kpi-value success">{{ completed_reports }}</div>
+    <div class="kpi-value success" id="kpi-completed-reports">-</div>
     <div class="kpi-label">Finalized Clinical Lab Reports</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-value blue">{{ total_patients }}</div>
+    <div class="kpi-value blue" id="kpi-total-patients">-</div>
     <div class="kpi-label">Patients Registry Records</div>
   </div>
 </div>
@@ -61,20 +61,10 @@
           <th>Phone Number</th>
         </tr>
       </thead>
-      <tbody>
-        {% for pat in recent_patients %}
+      <tbody id="recent-patients-tbody">
         <tr>
-          <td><span class="code-mrn">{{ pat.mrn }}</span></td>
-          <td><strong style="color: var(--text-primary); font-weight: 600;">{{ pat.first_name }} {{ pat.last_name }}</strong></td>
-          <td>{{ pat.gender|title }}</td>
-          <td>{{ pat.date_of_birth }}</td>
-          <td>{{ pat.phone_number }}</td>
+          <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 32px; font-size: 0.82rem;">Loading data...</td>
         </tr>
-        {% empty %}
-        <tr>
-          <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 32px; font-size: 0.82rem;">No patient records registered yet.</td>
-        </tr>
-        {% endfor %}
       </tbody>
     </table>
   </div>
@@ -83,7 +73,7 @@
 {% elif request.user.role == 'phlebotomist' %}
 <div class="dashboard-grid-2" style="grid-template-columns: 1fr;">
   <div class="kpi-card" style="padding: 40px; text-align: center;">
-    <div class="kpi-value warning" style="font-size: 3rem; margin-bottom: 12px;">{{ pending_collections }}</div>
+    <div class="kpi-value warning" style="font-size: 3rem; margin-bottom: 12px;" id="kpi-pending-collections">-</div>
     <div class="kpi-label" style="margin-bottom: 24px;">Lab Orders Pending Sample Collection</div>
     <a href="/phlebotomist-worklist/" class="btn-premium btn-premium-primary" style="padding: 10px 24px; font-weight: 600;">
       Go to Collection Desk
@@ -94,11 +84,11 @@
 {% elif request.user.role == 'technician' or request.user.role == 'lab_technician' %}
 <div class="dashboard-grid-2">
   <div class="kpi-card">
-    <div class="kpi-value warning">{{ pending_in_lab }}</div>
+    <div class="kpi-value warning" id="kpi-pending-in-lab">-</div>
     <div class="kpi-label">Collected Samples Pending In-Lab Reception</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-value success">{{ completed_reports }}</div>
+    <div class="kpi-value success" id="kpi-completed-reports">-</div>
     <div class="kpi-label">Finalized Completed Lab Orders</div>
   </div>
 </div>
@@ -109,6 +99,47 @@
   </a>
 </div>
 {% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await api.get('/api/v1/dashboard/');
+    if (res.success) {
+      const data = res.data;
+      
+      const setKpi = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value !== undefined ? value : '0';
+      };
+
+      setKpi('kpi-total-patients', data.total_patients);
+      setKpi('kpi-total-orders', data.total_orders);
+      setKpi('kpi-pending-collections', data.pending_collections);
+      setKpi('kpi-completed-reports', data.completed_reports);
+      setKpi('kpi-pending-in-lab', data.pending_in_lab);
+
+      const tbody = document.getElementById('recent-patients-tbody');
+      if (tbody) {
+        if (data.recent_patients && data.recent_patients.length > 0) {
+          tbody.innerHTML = data.recent_patients.map(pat => `
+            <tr>
+              <td><span class="code-mrn">${pat.mrn}</span></td>
+              <td><strong style="color: var(--text-primary); font-weight: 600;">${pat.first_name} ${pat.last_name}</strong></td>
+              <td>${pat.gender.charAt(0).toUpperCase() + pat.gender.slice(1)}</td>
+              <td>${pat.date_of_birth}</td>
+              <td>${pat.phone_number}</td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 32px; font-size: 0.82rem;">No patient records registered yet.</td></tr>`;
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load dashboard stats:', err);
+  }
+});
+</script>
 
 <!-- Clinical Integrity Operations Info Card -->
 <div class="clinical-card">

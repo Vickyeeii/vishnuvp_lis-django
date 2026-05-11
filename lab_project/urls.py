@@ -9,7 +9,8 @@ from rest_framework_simplejwt.views import (
 from . import views
 from .api_views import (
     UserViewSet, PatientViewSet, TestCategoryViewSet,
-    LabTestViewSet, LabOrderViewSet, ResultEntryViewSet
+    LabTestViewSet, LabOrderViewSet, ResultEntryViewSet,
+    api_dashboard_stats
 )
 
 # DRF Router Setup
@@ -24,7 +25,21 @@ router.register(r'users', UserViewSet, basename='user-api')
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.contrib.auth import authenticate, login
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_session_login_view(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        if not user.is_active:
+            return Response({"error": "This account is currently disabled."}, status=403)
+        login(request, user)
+        return Response({"message": "Login successful", "redirect": "/dashboard/"})
+    return Response({"error": "Invalid username or password."}, status=401)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -49,8 +64,10 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
 
     # REST Framework & JWT Endpoints (/api/v1/)
+    path('api/v1/dashboard/', api_dashboard_stats, name='api_dashboard_stats'),
     path('api/v1/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/v1/auth/login/', TokenObtainPairView.as_view(), name='token_login'),
+    path('api/v1/auth/session-login/', api_session_login_view, name='session_login'),
     path('api/v1/auth/logout/', api_logout_view, name='token_logout'),
     path('api/v1/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/v1/', include(router.urls)),

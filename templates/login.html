@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -179,7 +180,7 @@
           {% endfor %}
         {% endif %}
 
-        <form method="POST">
+        <form id="loginForm">
           {% csrf_token %}
 
           <div class="form-group">
@@ -187,6 +188,7 @@
             <input
               type="text"
               name="username"
+              id="username"
               class="form-control"
               placeholder="Enter username"
               required
@@ -199,15 +201,69 @@
             <input
               type="password"
               name="password"
+              id="password"
               class="form-control"
               placeholder="Enter password"
               required
             />
           </div>
 
-          <button class="btn-submit" type="submit">Sign In</button>
+          <button class="btn-submit" type="submit" id="submitBtn">Sign In</button>
         </form>
       </div>
     </div>
+
+    <!-- API Utility for Fetch requests -->
+    <script src="{% static 'js/api.js' %}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('loginForm');
+        
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const data = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+          };
+          
+          const btn = document.getElementById('submitBtn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = 'Signing In...';
+          btn.disabled = true;
+
+          try {
+            const res = await api.post('/api/v1/auth/session-login/', data);
+            if (res.success) {
+              window.location.href = res.data.redirect || '/dashboard/';
+            } else {
+              // Create dynamic alert box if it doesn't exist
+              let alertContainer = document.querySelector('.alert-box');
+              if (!alertContainer) {
+                alertContainer = document.createElement('div');
+                alertContainer.className = 'alert-box';
+                alertContainer.innerHTML = `
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  <span class="alert-text"></span>
+                `;
+                form.parentNode.insertBefore(alertContainer, form);
+              }
+              const errorMessage = res.data && res.data.error ? res.data.error : 'Login failed. Please try again.';
+              alertContainer.querySelector('.alert-text').textContent = errorMessage;
+            }
+          } catch (err) {
+            console.error(err);
+            alert('Network error occurred.');
+          } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          }
+        });
+      });
+    </script>
   </body>
 </html>
