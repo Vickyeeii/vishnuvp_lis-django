@@ -101,6 +101,28 @@
   text-align: right;
 }
 
+@media (max-width: 991.98px) {
+  .demographics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .demographics-grid {
+    grid-template-columns: 1fr;
+  }
+  .report-footer {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .report-notes {
+    max-width: 100%;
+  }
+  .report-signoff {
+    text-align: left;
+  }
+}
+
 /* @media print styles - High-fidelity clinical paper layout */
 @media print {
   body {

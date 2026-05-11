@@ -170,6 +170,9 @@
   .mobile-header {
     display: flex;
   }
+  .desktop-navbar {
+    display: none !important;
+  }
   .sidebar-close-btn {
     display: flex !important;
     position: absolute;
