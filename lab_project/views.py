@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.contrib import messages
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 from patients.models import Patient
 from orders.models import LabOrder, OrderLine
@@ -118,7 +119,10 @@ def patient_register_view(request):
 @login_required
 @role_required(['nurse', 'physician', 'admin'])
 def patient_list_view(request):
-    patients = Patient.objects.all()
+    patients_list = Patient.objects.all()
+    paginator = Paginator(patients_list, 10)
+    page_number = request.GET.get('page')
+    patients = paginator.get_page(page_number)
     context = {
         'patients': patients
     }
@@ -225,9 +229,13 @@ def phlebotomist_worklist_view(request):
 
     phlebotomists = CustomUser.objects.filter(role='phlebotomist')
 
+    paginator = Paginator(samples, 10)
+    page_number = request.GET.get('page')
+    samples_page = paginator.get_page(page_number)
+
     context = {
         'orders': orders,
-        'samples': samples,
+        'samples': samples_page,
         'phlebotomists': phlebotomists
     }
 
@@ -282,7 +290,11 @@ def technician_worklist_view(request):
 
     collected_orders = LabOrder.objects.filter(status=2)
     processing_orders = LabOrder.objects.filter(status=3)
-    results = ResultEntry.objects.filter(status='completed')
+    results_list = ResultEntry.objects.filter(status='completed')
+
+    paginator = Paginator(results_list, 10)
+    page_number = request.GET.get('page')
+    results = paginator.get_page(page_number)
 
     context = {
         'collected_orders': collected_orders,
@@ -306,8 +318,12 @@ def lab_report_view(request):
             Q(patient__mrn__icontains=search_query)
         ).distinct()
 
+    paginator = Paginator(orders, 10)
+    page_number = request.GET.get('page')
+    orders_page = paginator.get_page(page_number)
+
     context = {
-        'orders': orders
+        'orders': orders_page
     }
 
     return render(request, 'lab_report.html', context)
@@ -371,8 +387,12 @@ def admin_tests_view(request):
 
     categories = TestCategory.objects.all()
 
+    paginator = Paginator(tests, 10)
+    page_number = request.GET.get('page')
+    tests_page = paginator.get_page(page_number)
+
     context = {
-        'tests': tests,
+        'tests': tests_page,
         'categories': categories
     }
 
@@ -411,7 +431,11 @@ def admin_users_view(request):
 
         return redirect('/admin-users/')
 
-    users = CustomUser.objects.all().order_by('role')
+    users_list = CustomUser.objects.all().order_by('role')
+    paginator = Paginator(users_list, 10)
+    page_number = request.GET.get('page')
+    users = paginator.get_page(page_number)
+
     context = {
         'users': users
     }

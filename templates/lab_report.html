@@ -150,4 +150,8 @@
 </div>
 {% endfor %}
 
+{% if orders %}
+  {% include 'partials/pagination.html' with page_obj=orders page_param='page' %}
+{% endif %}
+
 {% endblock %}
